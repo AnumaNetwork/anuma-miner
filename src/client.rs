@@ -1,8 +1,8 @@
 use crate::{
     miner::MinerManager,
     proto::{
-        kaspad_message::Payload, rpc_client::RpcClient, GetBlockTemplateRequestMessage, GetInfoRequestMessage,
-        KaspadMessage,
+        anumad_message::Payload, rpc_client::RpcClient, GetBlockTemplateRequestMessage, GetInfoRequestMessage,
+        AnumadMessage,
     },
     Error, ShutdownHandler,
 };
@@ -12,10 +12,10 @@ use tokio_stream::wrappers::ReceiverStream;
 use tonic::{transport::Channel as TonicChannel, Streaming};
 
 #[allow(dead_code)]
-pub struct KaspadHandler {
+pub struct AnumadHandler {
     client: RpcClient<TonicChannel>,
-    pub send_channel: Sender<KaspadMessage>,
-    stream: Streaming<KaspadMessage>,
+    pub send_channel: Sender<AnumadMessage>,
+    stream: Streaming<AnumadMessage>,
     miner_address: String,
     mine_when_not_synced: bool,
     devfund_address: Option<String>,
@@ -23,7 +23,7 @@ pub struct KaspadHandler {
     block_template_ctr: u64,
 }
 
-impl KaspadHandler {
+impl AnumadHandler {
     pub async fn connect<D>(address: D, miner_address: String, mine_when_not_synced: bool) -> Result<Self, Error>
     where
         D: TryInto<tonic::transport::Endpoint>,
@@ -51,11 +51,11 @@ impl KaspadHandler {
         self.devfund_percent = percent;
     }
 
-    pub async fn client_send(&self, msg: impl Into<KaspadMessage>) -> Result<(), SendError<KaspadMessage>> {
+    pub async fn client_send(&self, msg: impl Into<AnumadMessage>) -> Result<(), SendError<AnumadMessage>> {
         self.send_channel.send(msg.into()).await
     }
 
-    pub async fn client_get_block_template(&mut self) -> Result<(), SendError<KaspadMessage>> {
+    pub async fn client_get_block_template(&mut self) -> Result<(), SendError<AnumadMessage>> {
         let pay_address = match &self.devfund_address {
             Some(devfund_address) if (self.block_template_ctr % 10_000) as u16 <= self.devfund_percent => {
                 devfund_address.clone()
@@ -73,7 +73,7 @@ impl KaspadHandler {
             }
             match msg.payload {
                 Some(payload) => self.handle_message(payload, miner).await?,
-                None => warn!("kaspad message payload is empty"),
+                None => warn!("anumad message payload is empty"),
             }
         }
         Ok(())
@@ -99,7 +99,7 @@ impl KaspadHandler {
                 }
                 info!("Get block response: {:?}", msg);
             }
-            Payload::GetInfoResponse(info) => info!("Kaspad version: {}", info.server_version),
+            Payload::GetInfoResponse(info) => info!("Anumad version: {}", info.server_version),
             Payload::NotifyBlockAddedResponse(res) => match res.error {
                 None => info!("Registered for block notifications"),
                 Some(e) => error!("Failed registering for block notifications: {:?}", e),

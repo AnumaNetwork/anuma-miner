@@ -1,47 +1,47 @@
 use crate::{
     pow::{self, HeaderHasher},
     proto::{
-        kaspad_message::Payload, GetBlockTemplateRequestMessage, GetInfoRequestMessage, KaspadMessage,
+        anumad_message::Payload, GetBlockTemplateRequestMessage, GetInfoRequestMessage, AnumadMessage,
         NotifyBlockAddedRequestMessage, RpcBlock, SubmitBlockRequestMessage,
     },
     Hash,
 };
 
-impl KaspadMessage {
+impl AnumadMessage {
     #[must_use]
     #[inline(always)]
     pub fn get_info_request() -> Self {
-        KaspadMessage { payload: Some(Payload::GetInfoRequest(GetInfoRequestMessage {})) }
+        AnumadMessage { payload: Some(Payload::GetInfoRequest(GetInfoRequestMessage {})) }
     }
     #[must_use]
     #[inline(always)]
     pub fn notify_block_added() -> Self {
-        KaspadMessage { payload: Some(Payload::NotifyBlockAddedRequest(NotifyBlockAddedRequestMessage {})) }
+        AnumadMessage { payload: Some(Payload::NotifyBlockAddedRequest(NotifyBlockAddedRequestMessage {})) }
     }
     #[must_use]
     #[inline(always)]
     pub fn submit_block(block: RpcBlock) -> Self {
-        KaspadMessage { payload: Some(Payload::SubmitBlockRequest(SubmitBlockRequestMessage { block: Some(block) })) }
+        AnumadMessage { payload: Some(Payload::SubmitBlockRequest(SubmitBlockRequestMessage { block: Some(block) })) }
     }
 }
 
-impl From<GetInfoRequestMessage> for KaspadMessage {
+impl From<GetInfoRequestMessage> for AnumadMessage {
     #[inline(always)]
     fn from(a: GetInfoRequestMessage) -> Self {
-        KaspadMessage { payload: Some(Payload::GetInfoRequest(a)) }
+        AnumadMessage { payload: Some(Payload::GetInfoRequest(a)) }
     }
 }
-impl From<NotifyBlockAddedRequestMessage> for KaspadMessage {
+impl From<NotifyBlockAddedRequestMessage> for AnumadMessage {
     #[inline(always)]
     fn from(a: NotifyBlockAddedRequestMessage) -> Self {
-        KaspadMessage { payload: Some(Payload::NotifyBlockAddedRequest(a)) }
+        AnumadMessage { payload: Some(Payload::NotifyBlockAddedRequest(a)) }
     }
 }
 
-impl From<GetBlockTemplateRequestMessage> for KaspadMessage {
+impl From<GetBlockTemplateRequestMessage> for AnumadMessage {
     #[inline(always)]
     fn from(a: GetBlockTemplateRequestMessage) -> Self {
-        KaspadMessage { payload: Some(Payload::GetBlockTemplateRequest(a)) }
+        AnumadMessage { payload: Some(Payload::GetBlockTemplateRequest(a)) }
     }
 }
 
